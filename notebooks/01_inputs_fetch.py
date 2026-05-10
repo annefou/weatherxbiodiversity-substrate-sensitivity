@@ -72,10 +72,18 @@ LOCAL_NSIDE128 = Path(
     )
 )
 
-# Zenodo concept-record IDs — filled in once upstream v0.1.0 releases are cut
-# and Zenodo mints the DOIs.
-ZENODO_NSIDE64_RECORD: str | None = None  # e.g. "10000001"
-ZENODO_NSIDE128_RECORD: str | None = None  # e.g. "10000002"
+# Zenodo concept-record IDs (v0.1.0 releases cut 2026-05-10).
+#
+# Concept DOIs (always resolve to the latest version):
+#   nside=64:  https://doi.org/10.5281/zenodo.20113777
+#   nside=128: https://doi.org/10.5281/zenodo.20113780
+#
+# The MODE='zenodo' fetch path is not yet wired (would require downloading
+# the Zenodo source tarball and extracting specific files). MODE='local'
+# remains the default and recommended dev path. Filling these in here so
+# a future v0.2.0 implementation has the IDs ready.
+ZENODO_NSIDE64_RECORD: str | None = "20113777"
+ZENODO_NSIDE128_RECORD: str | None = "20113780"
 
 ARTEFACTS_HEALPIX = [
     "healpix_port/outputs_iberia/posterior_vb_summary.csv",

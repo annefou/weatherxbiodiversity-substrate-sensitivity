@@ -3,7 +3,7 @@
 [![CI](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/actions/workflows/ci.yml/badge.svg)](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/actions/workflows/ci.yml)
 [![Jupyter Book](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/actions/workflows/jupyter-book.yml/badge.svg)](https://annefou.github.io/weatherxbiodiversity-substrate-sensitivity/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![DOI](https://zenodo.org/badge/DOI/{{ZENODO_DOI}}.svg)]({{ZENODO_DOI}})
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20113786.svg)](https://doi.org/10.5281/zenodo.20113786)
 [![FAIR4RS](https://img.shields.io/badge/FAIR4RS-conformant-brightgreen)](docs/fair4rs-checklist.md)
 [![FORRT](https://img.shields.io/badge/FORRT-replication-blue)](https://forrt.org/)
 
@@ -78,7 +78,7 @@ Drafts live in [`nanopubs/drafts/`](nanopubs/drafts/). Published URIs go into [`
 
 If you use this work, please cite:
 
-- This software: [`CITATION.cff`](CITATION.cff) → DOI [{{ZENODO_DOI}}]({{ZENODO_DOI}})
+- This software: [`CITATION.cff`](CITATION.cff) → DOI [10.5281/zenodo.20113786](https://doi.org/10.5281/zenodo.20113786)
 - The original paper: [10.1126/science.aax8591](https://doi.org/10.1126/science.aax8591)
 - The two upstream substrate replications via their own DOIs (see CITATION.cff `references`).
 

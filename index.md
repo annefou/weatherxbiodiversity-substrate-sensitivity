@@ -52,6 +52,6 @@ The four-notebook pipeline is documented in the chapter list on the left:
 
 If you use this work, please cite:
 
-- This software: [`CITATION.cff`](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/blob/main/CITATION.cff) → DOI [{{ZENODO_DOI}}]({{ZENODO_DOI}}).
+- This software: [`CITATION.cff`](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/blob/main/CITATION.cff) → DOI [10.5281/zenodo.20113786](https://doi.org/10.5281/zenodo.20113786).
 - The original paper: [10.1126/science.aax8591](https://doi.org/10.1126/science.aax8591).
 - The two upstream substrate replications via their own DOIs (see CITATION.cff `references`).
