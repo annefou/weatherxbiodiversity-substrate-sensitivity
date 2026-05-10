@@ -35,9 +35,37 @@ for horizon in ("2020_2029", "2030_2039"):
     subprocess.run(cmd, check=True, env=env)
 
 # %% [markdown]
-# Outputs:
+# ## Mid-term horizon (2030–2039)
 #
-# - `figures/variant_concordance_2020_2029.png`
-# - `figures/variant_concordance_2030_2039.png`
-# - `figures/variant_pairs_2020_2029.png`
-# - `figures/variant_pairs_2030_2039.png`
+# ### Cross-substrate concordance
+#
+# ![Cross-substrate Spearman concordance heatmap, mid-term horizon](../figures/variant_concordance_2030_2039.png)
+#
+# At n_cells ≥ 10, **variant (b) main-effects-only η** lifts cross-substrate
+# Spearman ρ from +0.59 (full GLMM) to **+0.97** — near-perfect agreement.
+# Variant (c) shared CEA reference standardisation barely improves on (a),
+# refuting the "standardisation alone fixes it" hypothesis.
+#
+# ### Per-variant scatter
+#
+# ![Per-variant scatter of η_64 vs η_128, mid-term horizon](../figures/variant_pairs_2030_2039.png)
+#
+# Each panel is one of the five projection variants. The diagonal is perfect
+# agreement between substrates; points are coloured by min(n_cells_64,
+# n_cells_128). High-N (yellow) species cluster on the diagonal in every
+# variant; low-N (dark) species sit far off the diagonal in (a)/(b)/(c) but
+# converge in (d)/(d2).
+#
+# ## Near-term horizon (2020–2029)
+#
+# ### Cross-substrate concordance
+#
+# ![Cross-substrate Spearman concordance heatmap, near-term horizon](../figures/variant_concordance_2020_2029.png)
+#
+# ### Per-variant scatter
+#
+# ![Per-variant scatter of η_64 vs η_128, near-term horizon](../figures/variant_pairs_2020_2029.png)
+#
+# The near-term horizon shows the same qualitative pattern as 2030–2039,
+# with slightly higher overall concordance because future predictors lie
+# closer to the historical training distribution (less extrapolation).

@@ -1,47 +1,57 @@
 # weatherxbiodiversity-substrate-sensitivity
 
-> **Climate change contributes to widespread declines among bumble bees across continents** — replication study.
->
-> Reference paper: [10.1126/science.aax8591](https://doi.org/10.1126/science.aax8591)
+> **Substrate-sensitivity diagnostic for TEI-based extirpation projection.**
+> Per-species ranking under future climate is grid-coupled at the projection step. Here is the mechanism, and three principled fixes.
 
-This repository is a self-contained replication of the headline claim from the reference paper above. It produces:
+This repository is a **methodological follow-up** to two single-substrate replications of Soroye et al. 2020 ([10.1126/science.aax8591](https://doi.org/10.1126/science.aax8591)) for Iberian *Bombus* under DestinE Climate DT SSP3-7.0:
 
-- A reproducible computational pipeline (Snakefile + notebooks).
-- A FORRT-tagged nanopublication chain on the [Science Live platform](https://platform.sciencelive4all.org), documenting the claim, the replication design, and the outcome with full provenance.
-- A Zenodo-archived release (source + container image) with a citable DOI.
+| Substrate | Repo | Purpose |
+|---|---|---|
+| HEALPix nside=64 (~92 km) | [`weatherxbiodiversity-projection`](https://github.com/annefou/weatherxbiodiversity-projection) | canonical replication |
+| HEALPix nside=128 (~46 km) | [`weatherxbiodiversity-projection-nside128`](https://github.com/annefou/weatherxbiodiversity-projection-nside128) | resolution extension |
 
-## Quick start
+Both single-substrate Outcomes are **Substrate-robust**: the GLMM coefficient on `sc_TEI_delta` is positive, large, and credible at all three pixelisations (CEA, nside=64, nside=128) — within ±30%. **Soroye's central biological claim replicates on Iberian *Bombus*.**
 
-```bash
-git clone https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity.git
-cd weatherxbiodiversity-substrate-sensitivity
-mamba env create -f environment.yml
-mamba activate weatherxbiodiversity-substrate-sensitivity
-snakemake --cores 1
-```
+But when the same GLMM is asked to **project** to future climate, per-species rankings diverge across substrates by 1–9 logits. This repo asks: why does that happen, and how should it be done properly?
 
-Or with Docker:
+## Headline finding
 
-```bash
-docker run --rm ghcr.io/annefou/weatherxbiodiversity-substrate-sensitivity:latest
-```
+![Cross-substrate Spearman concordance heatmap, mid-term horizon — variant (b) main-effects-only η at n_cells>=10 hits +0.97 (perfect agreement); the full GLMM (variant a) lags at +0.59](figures/variant_concordance_2030_2039.png)
 
-## Structure
+Substrate-coupling is **not** caused by per-species random-effect refit (substrate-stable, ΔRE ≤ 0.6 logits) or per-species niche-limit refit (modest, ΔT_range = 0–3°C). It is caused by **two mechanisms acting together**:
 
-- `paper/` — the source paper PDF (drop yours in there).
-- `notebooks/` — jupytext `.py` notebooks that drive the pipeline.
-- `data/` — downloaded by `notebooks/01_data_download.py`, never committed.
-- `nanopubs/` — drafts of the FORRT chain field-by-field, plus the published-URI registry.
-- `docs/` — operating manuals (FORRT form fields, chain decision tree, claim-type vocabulary).
-- `figures/` — curated figures used in the Jupyter Book.
+1. **Per-species sample size at projection time.** Below ~10 occupied + active cells per substrate, per-cell extrapolation noise dominates the species mean η, regardless of which projection variant is used.
+2. **The GLMM interaction term `sc_TEI_delta:sc_PEI_delta` compounds substrate-specific standardisation quadratically when future predictors extrapolate 2–4σ outside the training distribution.** The same physical climate signal z-scores to opposite tails of the standardised distribution under each substrate's local (μ, σ); the interaction term scales as the product, amplifying the divergence.
 
-## Nanopublication chain
+## Per-species view
 
-The published chain is listed in [`nanopubs/PUBLISHED.md`](nanopubs/PUBLISHED.md). Each step links to its viewer URL on the Science Live platform.
+![Per-variant scatter of η_64 vs η_128 — points coloured by min(n_cells_64, n_cells_128). High-N species cluster on the diagonal in every variant; low-N (dark) species sit far off the diagonal in (a)/(b)/(c) but converge in (d)/(d2).](figures/variant_pairs_2030_2039.png)
+
+Each panel is one of the five projection variants. The diagonal is perfect agreement between substrates. Yellow dots (n_cells ≥ 50) sit on the diagonal in every variant; dark dots (n_cells ≤ 5) sit far off. The substrate-invariant physical metrics (d) and (d2) bring the small-N species back toward the diagonal.
+
+## Recommended reporting protocol
+
+For any future TEI-based extirpation projection that compares across substrates:
+
+1. **Report only on species with ≥ 10 occupied + active cells per substrate.**
+2. **Drop the GLMM interaction terms at projection time** — keep them in the fit, but use main-effects-only η to extrapolate. At n≥10 this lifts the cross-substrate Spearman ρ from +0.59 to **+0.97** (mid-term horizon, both substrates).
+3. **Cross-check against a substrate-invariant physical metric** — mean future TEI, or fraction of cells where future TEI > 0.5. Both hit ρ ≥ 0.66 across the entire species set including small-N species.
+
+See [`results/SUBSTRATE_SENSITIVITY_FINDINGS.md`](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/blob/main/results/SUBSTRATE_SENSITIVITY_FINDINGS.md) for the full evidence — variant comparison tables at both horizons, decomposition of η into 10 GLMM terms per species, and refuted hypotheses.
+
+## Pipeline
+
+The four-notebook pipeline is documented in the chapter list on the left:
+
+- **01 — Inputs fetch.** Symlinks (development) or downloads (Zenodo) the upstream substrate artefacts.
+- **02 — Decompose.** Per-species η decomposition diagnostic at the SSP3-7.0 mid-term horizon (12 diagnostic species).
+- **03 — Variants.** Five-variant cross-substrate Spearman concordance at both horizons (2020–2029 and 2030–2039).
+- **04 — Figures.** Concordance heatmap + per-variant scatter pair-plots.
 
 ## Citation
 
-If you use this work, please cite both:
+If you use this work, please cite:
 
-- This software: [`CITATION.cff`](CITATION.cff) → DOI [{{ZENODO_DOI}}]({{ZENODO_DOI}}).
+- This software: [`CITATION.cff`](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/blob/main/CITATION.cff) → DOI [{{ZENODO_DOI}}]({{ZENODO_DOI}}).
 - The original paper: [10.1126/science.aax8591](https://doi.org/10.1126/science.aax8591).
+- The two upstream substrate replications via their own DOIs (see CITATION.cff `references`).
