@@ -1,64 +1,84 @@
-# Snakefile — orchestrates the replication pipeline end-to-end.
+# Snakefile — substrate-sensitivity diagnostic pipeline.
 #
-# Replace the placeholder rules with your actual replication steps. The
-# canonical pattern is one rule per pipeline stage, and each rule wraps a
-# notebook executed via jupytext (so the notebook stays the source of truth
-# and the Snakefile just sequences them).
+# This is a four-step methodological diagnostic that compares two upstream
+# substrate replications (HEALPix nside=64 and nside=128) at the projection
+# step. Inputs are fetched by 01_inputs_fetch.py — either symlinked from
+# sibling local checkouts (development) or downloaded from upstream Zenodo
+# records (release).
 #
 # Usage:
-#   snakemake --cores 1                  # run everything
-#   snakemake --cores 1 -n               # dry run
+#   snakemake --cores 1                      # run everything
+#   snakemake --cores 1 -n                   # dry run
+#   INPUTS_FETCH_MODE=zenodo snakemake ...   # use Zenodo upstream artefacts
 
 NOTEBOOKS = "notebooks"
-DATA = "data"
+INPUTS = "inputs"
 RESULTS = "results"
 FIGURES = "figures"
+
+UPSTREAM_ARTEFACTS = expand(
+    f"{INPUTS}/{{sub}}/posterior_vb_summary.csv",
+    sub=("nside64", "nside128"),
+)
 
 
 rule all:
     input:
-        # Replace with your actual final artefacts:
-        f"{FIGURES}/main_result.png",
-        f"{RESULTS}/summary.csv",
+        f"{FIGURES}/variant_concordance_2030_2039.png",
+        f"{FIGURES}/variant_pairs_2030_2039.png",
+        f"{FIGURES}/variant_concordance_2020_2029.png",
+        f"{FIGURES}/variant_pairs_2020_2029.png",
+        f"{RESULTS}/variant_comparison_2030_2039.csv",
+        f"{RESULTS}/variant_comparison_2020_2029.csv",
+        f"{RESULTS}/substrate_comparison_decomposition_2030_2039.txt",
 
 
-# ---------- 01: Data download ----------
-# Every replication MUST be self-contained: data is downloaded by the notebook,
-# never assumed to exist locally. See CLAUDE.md § Self-contained data.
-rule data_download:
+# ---------- 01: Fetch upstream substrate artefacts ----------
+# Symlinks (MODE=local) or downloads (MODE=zenodo) the upstream substrate
+# inputs into inputs/nside64/, inputs/nside128/, inputs/cea/.
+rule inputs_fetch:
     output:
-        f"{DATA}/raw/dataset.zip",
+        UPSTREAM_ARTEFACTS,
+        f"{INPUTS}/cea/dataGLMM_extinction.parquet",
     log:
-        f"{RESULTS}/logs/01_data_download.log",
+        f"{RESULTS}/logs/01_inputs_fetch.log",
     shell:
-        f"cd {{NOTEBOOKS}} && jupytext --to notebook --execute 01_data_download.py 2>&1 | tee ../{{log}}"
+        f"python {NOTEBOOKS}/01_inputs_fetch.py 2>&1 | tee {{log}}"
 
 
-# ---------- 02: Data clean ----------
-rule data_clean:
+# ---------- 02: Per-species η decomposition diagnostic ----------
+rule decompose:
     input:
-        f"{DATA}/raw/dataset.zip",
+        UPSTREAM_ARTEFACTS,
     output:
-        f"{DATA}/clean/dataset.parquet",
+        f"{RESULTS}/substrate_comparison_decomposition_2030_2039.txt",
     shell:
-        f"cd {{NOTEBOOKS}} && jupytext --to notebook --execute 02_data_clean.py"
+        f"python {NOTEBOOKS}/02_decompose.py"
 
 
-# ---------- 03: Analysis ----------
-rule analysis:
+# ---------- 03: Five-variant cross-substrate concordance ----------
+rule variants:
     input:
-        f"{DATA}/clean/dataset.parquet",
+        UPSTREAM_ARTEFACTS,
+        f"{INPUTS}/cea/dataGLMM_extinction.parquet",
     output:
-        f"{RESULTS}/summary.csv",
+        f"{RESULTS}/variant_comparison_2020_2029.csv",
+        f"{RESULTS}/variant_comparison_2020_2029.json",
+        f"{RESULTS}/variant_comparison_2030_2039.csv",
+        f"{RESULTS}/variant_comparison_2030_2039.json",
     shell:
-        f"cd {{NOTEBOOKS}} && jupytext --to notebook --execute 03_analysis.py"
+        f"python {NOTEBOOKS}/03_variants.py"
 
 
 # ---------- 04: Figures ----------
 rule figures:
     input:
-        f"{RESULTS}/summary.csv",
+        f"{RESULTS}/variant_comparison_2020_2029.json",
+        f"{RESULTS}/variant_comparison_2030_2039.json",
     output:
-        f"{FIGURES}/main_result.png",
+        f"{FIGURES}/variant_concordance_2020_2029.png",
+        f"{FIGURES}/variant_concordance_2030_2039.png",
+        f"{FIGURES}/variant_pairs_2020_2029.png",
+        f"{FIGURES}/variant_pairs_2030_2039.png",
     shell:
-        f"cd {{NOTEBOOKS}} && jupytext --to notebook --execute 04_figures.py"
+        f"python {NOTEBOOKS}/04_figures.py"

@@ -1,52 +1,43 @@
 # ---
 # jupyter:
 #   jupytext:
-#     formats: py:percent
+#     formats: ipynb,py:percent
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.0
-#   kernelspec:
-#     display_name: Python 3
-#     language: python
-#     name: python3
+#       jupytext_version: 1.16.4
 # ---
 
 # %% [markdown]
 # # 04 — Figures
 #
-# This notebook produces the figures used in the Jupyter Book. Each figure is
-# saved to `figures/` as a high-DPI PNG **and** displayed inline (so MyST
-# renders the figure inside the Jupyter Book — see
-# `docs/cicd-conventions.md`).
+# Generate the two main-result figures per horizon:
 #
-# **Inline display rule:** always pair `fig.savefig(...)` with `plt.show()`.
-# Without `plt.show()`, MyST builds an empty cell. Don't use
-# `matplotlib.use('Agg')` — it blocks inline display.
+# 1. **Concordance heatmap** — Spearman ρ for variant × n_cells filter.
+# 2. **Variant pair-plot** — per-species scatter of η_64 vs η_128 for each
+#    of the five variants, points coloured by min(n_cells_64, n_cells_128).
 
 # %%
+import os
+import subprocess
+import sys
 from pathlib import Path
 
-import matplotlib.pyplot as plt
-import pandas as pd
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
-# %%
-RESULTS_DIR = Path("../results")
-FIGURES_DIR = Path("../figures")
-FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+env = {**os.environ, "MPLBACKEND": "Agg"}
+for horizon in ("2020_2029", "2030_2039"):
+    cmd = [sys.executable, str(REPO_ROOT / "scripts" / "plot_variant_concordance.py"),
+           "--horizon", horizon]
+    print(f"=== Horizon {horizon} ===")
+    print("Running:", " ".join(cmd))
+    subprocess.run(cmd, check=True, env=env)
 
 # %% [markdown]
-# ## Main result figure
-
-# %%
-# summary = pd.read_csv(RESULTS_DIR / "summary.csv")
-
-# fig, ax = plt.subplots(figsize=(8, 5))
-# ax.bar(summary["metric"], summary["value"])
-# ax.set_title("Replication headline result")
-# ax.set_ylabel("Value")
-# fig.tight_layout()
+# Outputs:
 #
-# fig.savefig(FIGURES_DIR / "main_result.png", dpi=150, bbox_inches="tight")
-# plt.show()  # required for MyST inline display
+# - `figures/variant_concordance_2020_2029.png`
+# - `figures/variant_concordance_2030_2039.png`
+# - `figures/variant_pairs_2020_2029.png`
+# - `figures/variant_pairs_2030_2039.png`

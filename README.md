@@ -2,20 +2,41 @@
 
 [![CI](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/actions/workflows/ci.yml/badge.svg)](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/actions/workflows/ci.yml)
 [![Jupyter Book](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/actions/workflows/jupyter-book.yml/badge.svg)](https://annefou.github.io/weatherxbiodiversity-substrate-sensitivity/)
-[![Docker](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/actions/workflows/docker.yml/badge.svg)](https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity/pkgs/container/weatherxbiodiversity-substrate-sensitivity)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://zenodo.org/badge/DOI/{{ZENODO_DOI}}.svg)]({{ZENODO_DOI}})
 [![FAIR4RS](https://img.shields.io/badge/FAIR4RS-conformant-brightgreen)](docs/fair4rs-checklist.md)
 [![FORRT](https://img.shields.io/badge/FORRT-replication-blue)](https://forrt.org/)
-[![Science Live](https://img.shields.io/badge/Science%20Live-nanopub%20chain-purple)](nanopubs/PUBLISHED.md)
-[![RO-Crate](https://img.shields.io/badge/RO--Crate-1.2-orange)](ro-crate-metadata.json)
 
-> **Climate change contributes to widespread declines among bumble bees across continents** — replication study.
-> Reference paper: [10.1126/science.aax8591](https://doi.org/10.1126/science.aax8591)
+> **Substrate-sensitivity diagnostic for TEI-based extirpation projection.**
+> Per-species ranking under future climate is grid-coupled at the projection step. Here is the mechanism, and three principled fixes.
 
-This is a self-contained replication of the headline claim of the reference paper. It produces a reproducible computational pipeline, a Zenodo-archived release with a citable DOI, and a FORRT-tagged nanopublication chain on the [Science Live platform](https://platform.sciencelive4all.org).
+This repository is a **methodological follow-up** to two single-substrate replications of Soroye et al. 2020 ([10.1126/science.aax8591](https://doi.org/10.1126/science.aax8591)) for Iberian *Bombus* under DestinE Climate DT SSP3-7.0:
 
----
+| Substrate | Repo | Purpose |
+|---|---|---|
+| HEALPix nside=64 (~92 km) | [`weatherxbiodiversity-projection`](https://github.com/annefou/weatherxbiodiversity-projection) | canonical replication |
+| HEALPix nside=128 (~46 km) | [`weatherxbiodiversity-projection-nside128`](https://github.com/annefou/weatherxbiodiversity-projection-nside128) | resolution extension |
+
+Both single-substrate Outcomes are **Substrate-robust**: the GLMM coefficient on `sc_TEI_delta` is positive, large, and credible at all three pixelisations (CEA, nside=64, nside=128) — within ±30%. **Soroye's central biological claim replicates on Iberian *Bombus*.**
+
+But when the same GLMM is asked to **project** to future climate, per-species rankings diverge across substrates by 1–9 logits. This repo asks: why does that happen, and how should it be done properly?
+
+## Headline finding
+
+The substrate-coupling at projection time is **not** caused by per-species random-effect refit (substrate-stable, ΔRE ≤ 0.6 logits) or by per-species niche-limit refit (modest, ΔT_range = 0–3°C). It is caused by **two mechanisms acting together**:
+
+1. **Per-species sample size at projection time.** Below ~10 occupied + active cells per substrate, per-cell extrapolation noise dominates the species mean η, regardless of which projection variant is used.
+2. **The GLMM interaction term `sc_TEI_delta:sc_PEI_delta` compounds substrate-specific standardisation quadratically when future predictors extrapolate 2–4σ outside the training distribution.** The same physical climate signal z-scores to opposite tails of the standardised distribution under each substrate's local (μ, σ); the interaction term scales as the product, amplifying the divergence.
+
+## Recommended reporting protocol
+
+For any future TEI-based extirpation projection that compares across substrates:
+
+1. **Report only on species with ≥ 10 occupied + active cells per substrate.**
+2. **Drop the GLMM interaction terms at projection time** — keep them in the fit, but use main-effects-only η to extrapolate. At n≥10 this lifts the cross-substrate Spearman ρ from +0.59 to **+0.97** (mid-term horizon, both substrates).
+3. **Cross-check against a substrate-invariant physical metric** — mean future TEI, or fraction of cells where future TEI > 0.5. Both hit ρ ≥ 0.66 across the entire species set including small-N species.
+
+See [`results/SUBSTRATE_SENSITIVITY_FINDINGS.md`](results/SUBSTRATE_SENSITIVITY_FINDINGS.md) for the full evidence — variant comparison tables at both horizons, decomposition of η into 10 GLMM terms per species, and refuted hypotheses.
 
 ## Quick start
 
@@ -27,96 +48,40 @@ mamba activate weatherxbiodiversity-substrate-sensitivity
 snakemake --cores 1
 ```
 
-Or with Docker:
+This runs the four-step pipeline:
 
-```bash
-docker run --rm ghcr.io/annefou/weatherxbiodiversity-substrate-sensitivity:latest
-```
-
-The Jupyter Book version is at <https://annefou.github.io/weatherxbiodiversity-substrate-sensitivity/>.
-
-## Built from a template
-
-This repository was created from [`sciencelivehub/forrt-replication-template`](https://github.com/sciencelivehub/forrt-replication-template). The template ships an operating manual for AI assistants ([`CLAUDE.md`](CLAUDE.md), [`AGENTS.md`](AGENTS.md)), domain conventions ([`DOMAIN.md`](DOMAIN.md)), and reference docs (`docs/`) so that an AI working only inside this repository can guide a researcher from "paper PDF + GitHub repo" to "published FORRT chain + Zenodo DOI" with no other context.
-
-If you are reading this in a fresh fork, run [`/init-template`](.claude/skills/init-template/SKILL.md) inside Claude Code to substitute the placeholder tokens with your details. (For other AI tools, see [`docs/ai-portability.md`](docs/ai-portability.md).)
-
-After `/init-template`, do these one-time setup steps to enable the full CI/CD path:
-
-- **Enable GitHub Pages** at *Settings → Pages → Source: GitHub Actions*. Until enabled, the Jupyter Book build runs but the deploy step is skipped (CI stays green).
-- The CI workflows ship with **scaffold-detection guards** — they run end-to-end only after you implement Phase 2 (the `notebooks/*.py` files). Until then they exit early with an informative `::notice::` and the badges stay green.
-
-## Repository structure
-
-```
-.
-├── CLAUDE.md / AGENTS.md       # operating manual for AI assistants
-├── DOMAIN.md                   # domain flavour (current: biodiversity + earth observation)
-├── USER_PREFERENCES.md         # per-user style (edit on first clone)
-├── README.md                   # this file
-├── LICENSE                     # MIT
-├── CITATION.cff                # how to cite
-├── codemeta.json               # software metadata (CodeMeta-2.0)
-├── ro-crate-metadata.json      # research object packaging (RO-Crate 1.2)
-├── environment.yml             # conda/pip dependencies (single source of truth)
-├── Dockerfile                  # container build
-├── Snakefile                   # pipeline orchestration
-├── myst.yml + index.md         # Jupyter Book scaffold
-├── paper/                      # the source paper PDF
-├── data/                       # downloaded artefacts (gitignored)
-├── notebooks/                  # jupytext .py pipeline (01–04)
-├── nanopubs/                   # FORRT chain drafts + published-URI registry
-├── docs/                       # reference material
-├── figures/                    # curated figures used in the Jupyter Book
-├── .github/workflows/          # CI, Jupyter Book, Docker
-└── .claude/                    # Claude Code agents, skills, sandbox config
-```
+1. `notebooks/01_inputs_fetch.py` — fetches the upstream substrate artefacts. Two modes:
+   - `MODE=local` (development) — symlinks from sibling working copies on the same filesystem.
+   - `MODE=zenodo` — downloads from the upstream repos' Zenodo records (wired up after the upstream v0.1.0 releases are cut).
+2. `notebooks/02_decompose.py` — per-species η decomposition diagnostic at the SSP3-7.0 mid-term horizon.
+3. `notebooks/03_variants.py` — five-variant cross-substrate Spearman concordance at both horizons.
+4. `notebooks/04_figures.py` — concordance heatmap + per-variant scatter pair-plots.
 
 ## What you get
 
-This template bakes in conventions that took multiple replications to discover. By using it, you inherit:
+- `results/SUBSTRATE_SENSITIVITY_FINDINGS.md` — the full findings document (mechanism, refuted hypotheses, scientific findings F1–F4 about Iberian *Bombus*, recommended reporting protocol).
+- `results/variant_comparison_<horizon>.{csv,json}` — per-species per-variant rankings + Spearman concordance summaries.
+- `results/substrate_comparison_decomposition_2030_2039.txt` — 12-species decomposition table.
+- `figures/variant_concordance_<horizon>.png` — Spearman ρ heatmap (variant × n_cells filter).
+- `figures/variant_pairs_<horizon>.png` — per-variant scatter, coloured by min(n_cells_64, n_cells_128).
 
-- **FAIR4RS conformance** — see [`docs/fair4rs-checklist.md`](docs/fair4rs-checklist.md) for the principle-by-principle mapping.
-- **Self-contained data downloads** — the first notebook fetches everything; no manual data prep.
-- **`environment.yml` as single source of truth** — local dev, Docker, and CI all use the same pinned versions.
-- **`mamba-org/setup-micromamba@v3`-based CI** — caches the env, runs the pipeline, executes notebooks via a glob.
-- **Jupyter Book deployment** — auto-deploys to GitHub Pages with `BASE_URL` set correctly. (Don't put `base_url` in `myst.yml` — MyST silently ignores it.)
-- **Docker + GHCR + Zenodo image archival** — `release` trigger pushes to GHCR and (optionally) archives to Zenodo for long-term preservation.
-- **RO-Crate packaging** — the entire repo is a navigable Research Object via `ro-crate-metadata.json` (Process Run Crate + Workflow RO-Crate profiles).
-- **Six-step FORRT chain workspace** — `nanopubs/drafts/` has a field-by-field skeleton for each step. `nanopubs/PUBLISHED.md` is the URI registry.
-- **Layered AI guidance** — `CLAUDE.md` (universal) + `DOMAIN.md` (swappable per field) + `USER_PREFERENCES.md` (per-user). See [`docs/ai-portability.md`](docs/ai-portability.md) for non-Claude AI tools.
-- **Sandbox by default** — `.claude/settings.json` denies file ops outside the repo, so a fresh AI session can't accidentally read `~/.ssh/` or write to `/etc/`.
+## FORRT chain
 
-## The six FORRT chain steps
+This repo's FORRT chain is **paper-rooted on Soroye 2020** (the upstream paper whose TEI mechanism is being diagnosed). The CiTO citations reference both upstream replication chains:
 
-A complete FORRT chain has six steps published on [platform.sciencelive4all.org](https://platform.sciencelive4all.org):
+- `extends` ↔ `weatherxbiodiversity-projection` FORRT chain
+- `extends` ↔ `weatherxbiodiversity-projection-nside128` FORRT chain
 
-```
-Quote-with-comment  →  AIDA  →  FORRT Claim  →  Replication Study  →  Replication Outcome  →  CiTO Citation
-```
-
-(For question-rooted chains with no upstream paper, replace step 1 with PICO or PCC. See [`docs/chain-decision-tree.md`](docs/chain-decision-tree.md).)
-
-Drafts live in [`nanopubs/drafts/`](nanopubs/drafts/) field-by-field. Published URIs go into [`nanopubs/PUBLISHED.md`](nanopubs/PUBLISHED.md).
-
-Optional further layers:
-
-- **Research Software nanopub** — for reusable upstream tools (not demo repos). See [`docs/forrt-form-fields.md`](docs/forrt-form-fields.md) § Research Software.
-- **Research Synthesis nanopub** — when this chain is part of a multi-chain story. See [`docs/forrt-form-fields.md`](docs/forrt-form-fields.md) § Research Synthesis.
-
-## After publishing
-
-When the chain is live and the FAIR4RS checklist is green, drafting an announcement post is the next step. See [`docs/announcement-template.md`](docs/announcement-template.md) for the structural template (vision-piece-first; the worked replication is the payoff, not the lead).
-
-For lower-level nanopub work — retraction, superseding, batch publishing — see [`docs/programmatic-nanopubs.md`](docs/programmatic-nanopubs.md).
+Drafts live in [`nanopubs/drafts/`](nanopubs/drafts/). Published URIs go into [`nanopubs/PUBLISHED.md`](nanopubs/PUBLISHED.md).
 
 ## Citation
 
-If you use this work, please cite both:
+If you use this work, please cite:
 
 - This software: [`CITATION.cff`](CITATION.cff) → DOI [{{ZENODO_DOI}}]({{ZENODO_DOI}})
 - The original paper: [10.1126/science.aax8591](https://doi.org/10.1126/science.aax8591)
+- The two upstream substrate replications via their own DOIs (see CITATION.cff `references`).
 
 ## Acknowledgements
 
-This repository was built from [`sciencelivehub/forrt-replication-template`](https://github.com/sciencelivehub/forrt-replication-template), part of the [Science Live platform](https://platform.sciencelive4all.org). The template is licensed MIT and contributions (especially new domain flavours under [`docs/domain-flavours/`](docs/domain-flavours/)) are welcome.
+Built from [`sciencelivehub/forrt-replication-template`](https://github.com/sciencelivehub/forrt-replication-template), part of the [Science Live platform](https://platform.sciencelive4all.org).

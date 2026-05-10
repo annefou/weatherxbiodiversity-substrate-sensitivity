@@ -41,3 +41,9 @@ docker-image.tar.gz
 # Claude scratch
 .claude/.cache/
 .claude/local/
+
+# Upstream inputs — symlinked or fetched by notebooks/01_inputs_fetch.py
+inputs/
+
+# sed -i.bak detritus
+*.bak
