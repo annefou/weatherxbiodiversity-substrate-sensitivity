@@ -72,7 +72,9 @@ def main(horizon: str):
     plt.close(fig)
     print(f"  wrote {out1}")
 
-    # Per-variant scatter — colour by n_cells
+    # Per-variant scatter — colour by n_cells using the analytical thresholds
+    # we actually report on (the same filters used in the concordance heatmap).
+    # Discrete bins so the visual signal is "red = unreliable, green = trust".
     fig, axes = plt.subplots(2, 3, figsize=(12, 7.5), dpi=150)
     axes = axes.flatten()
     pairs = [
@@ -82,12 +84,16 @@ def main(horizon: str):
         ("d_frac_64", "d_frac_128", "(d) Mean future TEI"),
         ("d2_frac_64", "d2_frac_128", "(d2) Frac TEI>0.5"),
     ]
-    n_max = max(df["n_cells_64"].max(), df["n_cells_128"].max())
+    n_min = np.minimum(df["n_cells_64"], df["n_cells_128"]).astype(float)
+    n_top = float(max(n_min.max(), 20)) + 1
+    bin_edges = [1, 5, 10, 20, n_top]
+    bin_colors = ["#d73027", "#fdae61", "#a6d96a", "#1a9850"]
+    bin_labels = ["n<5\n(unreliable)", "n=5–9\n(borderline)", "n=10–19\n(reliable)", "n≥20\n(very reliable)"]
+    cmap = plt.matplotlib.colors.ListedColormap(bin_colors)
+    norm = plt.matplotlib.colors.BoundaryNorm(bin_edges, cmap.N)
     for ax, (xc, yc, title) in zip(axes, pairs):
-        n_min = np.minimum(df["n_cells_64"], df["n_cells_128"])
-        sc = ax.scatter(df[xc], df[yc], c=n_min, cmap="viridis",
-                        norm=plt.matplotlib.colors.LogNorm(vmin=1, vmax=n_max),
-                        s=40, alpha=0.85, edgecolor="k", linewidth=0.4)
+        sc = ax.scatter(df[xc], df[yc], c=n_min, cmap=cmap, norm=norm,
+                        s=55, alpha=0.9, edgecolor="k", linewidth=0.5)
         lo = float(np.nanmin([df[xc].min(), df[yc].min()]))
         hi = float(np.nanmax([df[xc].max(), df[yc].max()]))
         ax.plot([lo, hi], [lo, hi], "k--", alpha=0.4, linewidth=1)
@@ -95,7 +101,13 @@ def main(horizon: str):
         ax.set_ylabel("nside=128")
         ax.set_title(title)
     axes[-1].axis("off")
-    cbar = fig.colorbar(sc, ax=axes[-1], label="min(n_cells_64, n_cells_128)", shrink=0.8)
+    cbar = fig.colorbar(
+        sc, ax=axes[-1],
+        ticks=[3, 7, 14.5, (20 + n_top) / 2],  # midpoint of each bin
+        shrink=0.85, fraction=0.5,
+    )
+    cbar.ax.set_yticklabels(bin_labels, fontsize=8)
+    cbar.set_label("min(n_cells_64, n_cells_128)", fontsize=9)
     fig.suptitle(
         f"Per-species substrate concordance, horizon {horizon.replace('_', '–')} — "
         f"each point is one Bombus species; diagonal = perfect agreement",
