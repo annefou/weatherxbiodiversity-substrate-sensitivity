@@ -25,13 +25,13 @@ Format: starts with `10.` — bare DOI, **NOT** `https://doi.org/...` form.
 
 Verbatim from the paper PDF in `paper/`. Character-for-character. ≤ 500 chars in whole-text mode.
 
-> _Read the PDF first. Don't paraphrase from memory. See `docs/verify-before-drafting.md`._
+Source: Soroye, Newbold, Kerr (2020), *Science* 367(6478): 685, **Abstract** (p. 685, second-to-last sentence of the abstract paragraph).
 
 ```
-
+Increasing frequency of hotter temperatures predicts species' local extinction risk, chances of colonizing a new area, and changing species richness.
 ```
 
-Character count: ___ / 500.
+Character count: 149 / 500.
 
 ### Comment (textarea, required)
 
@@ -40,7 +40,7 @@ Subtitle: *"Our interpretation or explanation of why this quotation is relevant.
 Why this quote matters and what the replication tests. Connect the paper's claim to the work this repo does. Don't repeat the quote.
 
 ```
-
+This sentence states the mechanism — frequency of temperatures exceeding species' historical thermal tolerances drives local extinction, colonization, and richness change — whose forward-projection behaviour this methodological diagnostic interrogates. The original paper validated this mechanism retrospectively for 66 Bombus species across North America and Europe at ~50 km / monthly resolution. Two upstream Iberian replications (weatherxbiodiversity-projection at HEALPix nside=64 and weatherxbiodiversity-projection-nside128) confirm the mechanism replicates at fit time across three substrates within ±30%. This study asks: when the same fitted GLMM is used to project to SSP3-7.0 future climate, does the per-species extirpation-risk ranking depend on the spatial pixelisation? The answer (yes, for species observed in fewer than ten historical cells) qualifies — but does NOT refute — the original mechanism. We anchor on this sentence because the diagnostic is downstream of the mechanism it characterises, not a refutation of it.
 ```
 
 ## Publication note

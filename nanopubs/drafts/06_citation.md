@@ -11,28 +11,18 @@
 URI of the Outcome published in step 05. Pull from `nanopubs/PUBLISHED.md`.
 
 ```
-
+<replace-with-published-Outcome-URI-from-step-05>
 ```
 
 ### List citations (repeatable group, required ≥1)
 
-#### Citation 1 — back to the original paper
+#### Citation 1 — back to the original paper (Soroye 2020)
 
 ##### Citation Type (dropdown)
 
-Choose based on the Outcome's validation status:
+- [x] **`qualifies`**
 
-- Validated → `confirms`
-- PartiallySupported → `qualifies`
-- Contradicted → `disputes`
-
-For question-rooted chains where there is no original paper to confirm/dispute, use `usesMethodIn` or `citesAsAuthority` for the methodology paper(s).
-
-> **Note:** `replicates` is NOT in the Science Live dropdown (despite existing in upstream CiTO). When citing a notebook/tutorial that was directly reused, use **`credits`** instead.
-
-```
-
-```
+(Outcome verdict is PartiallySupported, which maps to CiTO `qualifies`. The TEI mechanism Soroye et al. introduced REPLICATES at fit time across three substrates — the qualification is downstream, about how to USE the fitted GLMM at the projection step. This is not a refutation; it is a methodological caveat that extends the mechanism's applicability conditions.)
 
 ##### DOI or other URL of the cited work (text input)
 
@@ -40,11 +30,37 @@ For question-rooted chains where there is no original paper to confirm/dispute, 
 https://doi.org/10.1126/science.aax8591
 ```
 
-#### Additional citations (optional)
+#### Citation 2 — extends the canonical nside=64 sibling chain
 
-If the Outcome cites methods papers, related replications, or upstream tools, add them here.
+##### Citation Type (dropdown)
 
-- _Type: ___ → URL: ___
+- [x] **`extends`**
+
+(This Study takes the canonical nside=64 replication's outputs as input artefacts and produces a methodological diagnostic that complements its Outcome. The nside=64 sibling's Outcome reports per-species rankings filtered per the recommended protocol from THIS chain.)
+
+##### DOI or other URL of the cited work (text input)
+
+```
+https://doi.org/10.5281/zenodo.20113777
+```
+
+(Concept DOI of `weatherxbiodiversity-projection`. Or, once published, paste the canonical nside=64 sibling Outcome URI directly.)
+
+#### Citation 3 — extends the nside=128 substrate-extension sibling chain
+
+##### Citation Type (dropdown)
+
+- [x] **`extends`**
+
+(Likewise, this Study takes the nside=128 substrate-extension's outputs as input artefacts. The nside=128 sibling's Outcome also reports rankings filtered per the recommended protocol from this chain.)
+
+##### DOI or other URL of the cited work (text input)
+
+```
+https://doi.org/10.5281/zenodo.20113780
+```
+
+(Concept DOI of `weatherxbiodiversity-projection-nside128`.)
 
 ## Publication note
 
