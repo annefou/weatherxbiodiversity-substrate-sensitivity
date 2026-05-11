@@ -13,7 +13,7 @@
 Zenodo concept DOI URL when available, or a GitHub URL. Full URL form.
 
 ```
-10.5281/zenodo.20113786
+https://doi.org/10.5281/zenodo.20113786
 ```
 
 ### Software Title (text input, required)
@@ -21,7 +21,7 @@ Zenodo concept DOI URL when available, or a GitHub URL. Full URL form.
 The full name or title of the software.
 
 ```
-
+weatherxbiodiversity-substrate-sensitivity — Cross-substrate diagnostic toolkit for TEI-based extirpation projection (scripts/compare_substrates.py, scripts/compare_variants.py, scripts/plot_variant_concordance.py)
 ```
 
 ### Repository URL (text input, required)
@@ -35,7 +35,7 @@ https://github.com/annefou/weatherxbiodiversity-substrate-sensitivity
 URI of the FORRT Claim or PCC question this software is associated with — pull from `nanopubs/PUBLISHED.md`. This is the back-link to the FORRT chain.
 
 ```
-
+<replace-with-published-Claim-URI-from-step-03>
 ```
 
 ### License (text input, optional)
@@ -48,15 +48,17 @@ https://spdx.org/licenses/MIT.html
 
 Input data DOIs (Zenodo data records, dataset DOIs, ESA product DOIs).
 
-- _Dataset URL 1: ___
-- _Dataset URL 2: ___
+- Canonical nside=64 sibling repo's Zenodo concept DOI: https://doi.org/10.5281/zenodo.20113777 (provides one of the two cross-substrate input artefacts)
+- nside=128 substrate-extension sibling's Zenodo concept DOI: https://doi.org/10.5281/zenodo.20113780 (provides the other cross-substrate input artefact)
 
 ### Related Publications (repeatable group, optional)
 
 One-way back-links to the FORRT Outcome URI(s) the software implements, plus any cited methods papers.
 
-- _Publication URL 1 (FORRT Outcome from step 05): ___
-- _Publication URL 2 (methods paper, optional): ___
+- FORRT Outcome from step 05 of this chain: `<replace-with-published-Outcome-URI-from-step-05>`
+- Sibling canonical nside=64 chain's Outcome: `<replace-with-nside64-sibling-Outcome-URI>`
+- Sibling nside=128 chain's Outcome: `<replace-with-nside128-sibling-Outcome-URI>`
+- Soroye, Newbold & Kerr (2020) — the paper whose TEI mechanism this diagnostic interrogates at the projection step: https://doi.org/10.1126/science.aax8591
 
 ## Publication note
 
